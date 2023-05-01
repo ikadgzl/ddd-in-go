@@ -11,7 +11,7 @@ import (
 
 func TestMemory_GetCustom(t *testing.T) {
 	type testCase struct {
-		name        string
+		test        string
 		id          uuid.UUID
 		expectedErr error
 	}
@@ -28,19 +28,19 @@ func TestMemory_GetCustom(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:        "no customer by id",
+			test:        "no customer by id",
 			id:          uuid.MustParse("de26c30a-e78d-11ed-a05b-0242ac120003"),
 			expectedErr: customer.ErrCustomerNotFound,
 		},
 		{
-			name:        "customer by id",
+			test:        "customer by id",
 			id:          id,
 			expectedErr: nil,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.test, func(t *testing.T) {
 			_, err := repo.Get(tc.id)
 
 			if !errors.Is(err, tc.expectedErr) {
