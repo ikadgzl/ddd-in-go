@@ -60,10 +60,10 @@ func WithMemoryProductRepository(products []aggregate.Product) OrderConfig {
 	}
 }
 
-func (o *OrderService) CreateOrder(customerID uuid.UUID, productIDs []uuid.UUID) error {
+func (o *OrderService) CreateOrder(customerID uuid.UUID, productIDs []uuid.UUID) (float64, error) {
 	c, err := o.cr.Get(customerID)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	var products []aggregate.Product
@@ -72,13 +72,14 @@ func (o *OrderService) CreateOrder(customerID uuid.UUID, productIDs []uuid.UUID)
 	for _, id := range productIDs {
 		p, err := o.pr.GetByID(id)
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 		products = append(products, p)
 		total += p.GetPrice()
 	}
 
-	log.Printf("Customer: {%s} has ordered %d products with the total price of %f", c.GetID(), len(products), total)
-	return nil
+	log.Printf("Customer with id: %s has ordered %d products", c.GetID(), len(products))
+
+	return total, nil
 }

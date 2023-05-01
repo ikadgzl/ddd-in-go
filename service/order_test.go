@@ -55,9 +55,8 @@ func TestOrder_NewOrderService(t *testing.T) {
 		products[2].GetID(),
 	}
 
-	err = os.CreateOrder(c.GetID(), orders)
+	_, err = os.CreateOrder(c.GetID(), orders)
 	if err != nil {
 		t.Error(err)
 	}
-
 }
