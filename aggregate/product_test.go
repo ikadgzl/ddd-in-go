@@ -7,10 +7,12 @@ import (
 	"github.com/ikadgzl/ddd-in-go/aggregate"
 )
 
-func TestCustomer_NewCustomer(t *testing.T) {
+func TestProduct_NewProduct(t *testing.T) {
 	type testCase struct {
 		test        string
 		name        string
+		description string
+		price       float64
 		expectedErr error
 	}
 
@@ -18,18 +20,28 @@ func TestCustomer_NewCustomer(t *testing.T) {
 		{
 			test:        "Invalid name, empty",
 			name:        "",
-			expectedErr: aggregate.ErrInvalidPerson,
+			description: "d",
+			price:       0,
+			expectedErr: aggregate.ErrMissingValue,
 		},
 		{
-			test:        "Valid name",
-			name:        "Ilker Adiguzel",
+			test:        "Invalid description, empty",
+			name:        "n",
+			description: "",
+			price:       0,
+			expectedErr: aggregate.ErrMissingValue,
+		},
+		{
+			test:        "Valid product",
+			name:        "Beer",
+			description: "Beverage",
 			expectedErr: nil,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.test, func(t *testing.T) {
-			_, err := aggregate.NewCustomer(tc.name)
+			_, err := aggregate.NewProduct(tc.name, tc.description, tc.price)
 
 			if !errors.Is(err, tc.expectedErr) {
 				t.Errorf("expected error %v, got %v", tc.expectedErr, err)
