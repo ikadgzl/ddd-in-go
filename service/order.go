@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"log"
 
 	"github.com/google/uuid"
 	"github.com/ikadgzl/ddd-in-go/aggregate"
 	"github.com/ikadgzl/ddd-in-go/domain/customer"
 	cm "github.com/ikadgzl/ddd-in-go/domain/customer/memory"
+	"github.com/ikadgzl/ddd-in-go/domain/customer/mongo"
 	"github.com/ikadgzl/ddd-in-go/domain/product"
 	pm "github.com/ikadgzl/ddd-in-go/domain/product/memory"
 )
@@ -31,23 +33,31 @@ func NewOrderService(cfgs ...OrderConfig) (*OrderService, error) {
 	return os, nil
 }
 
-func WithCustomerRepository(cr customer.CustomerRepository) OrderConfig {
+func WithMemoryCustomerRepository() OrderConfig {
 	return func(os *OrderService) error {
+		cr := cm.New()
 		os.cr = cr
 		return nil
 	}
 }
 
-func WithMemoryCustomerRepository() OrderConfig {
-	cr := cm.New()
+func WithMongoCustomerRepository(ctx context.Context, connectionString string) OrderConfig {
+	return func(os *OrderService) error {
+		cr, err := mongo.New(ctx, connectionString)
 
-	return WithCustomerRepository(cr)
+		if err != nil {
+			return err
+		}
+
+		os.cr = cr
+		return nil
+	}
 }
 
 func WithMemoryProductRepository(products []aggregate.Product) OrderConfig {
-	pr := pm.New()
-
 	return func(os *OrderService) error {
+		pr := pm.New()
+
 		for _, p := range products {
 			err := pr.Add(p)
 			if err != nil {
